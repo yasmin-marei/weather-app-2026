@@ -5,6 +5,7 @@ interface SearchBarProps {
   onChange: (value: string) => void;
   onSubmit: () => void;
   disabled?: boolean;
+  placeholder?: string;
 }
 
 export default function SearchBar({
@@ -12,6 +13,7 @@ export default function SearchBar({
   onChange,
   onSubmit,
   disabled = false,
+  placeholder = "Search for a city",
 }: SearchBarProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,9 +40,9 @@ export default function SearchBar({
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Search for a city"
+          placeholder={placeholder}
           disabled={disabled}
-          aria-label="Search for a city"
+          aria-label={placeholder}
           className="w-full rounded-lg bg-[#1a1d24] border border-white/10 pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />
       </div>

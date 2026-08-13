@@ -1,0 +1,36 @@
+export const translations = {
+  en: {
+    title: "Weather App",
+    searchPlaceholder: "Search for a city",
+    idleMessage: "Search for a city to see the weather",
+    recentSearches: "Recent searches",
+    loading: "Loading weather data...",
+    forecastTitle: "5-Day Forecast",
+    day: "Day",
+    highLow: "High/Low",
+    condition: "Condition",
+    highOf: "with a high of",
+    humidity: "Humidity",
+    wind: "Wind",
+    feelsLike: "Feels Like",
+    windUnit: "km/h",
+  },
+  ar: {
+    title: "تطبيق الطقس",
+    searchPlaceholder: "ابحث عن مدينة",
+    idleMessage: "ابحث عن مدينة لمعرفة حالة الطقس",
+    recentSearches: "عمليات البحث الأخيرة",
+    loading: "جاري تحميل بيانات الطقس...",
+    forecastTitle: "توقعات 5 أيام",
+    day: "اليوم",
+    highLow: "الأعلى/الأدنى",
+    condition: "الحالة",
+    highOf: "بأعلى درجة حرارة",
+    humidity: "الرطوبة",
+    wind: "الرياح",
+    feelsLike: "الإحساس الحراري",
+    windUnit: "كم/س",
+  },
+};
+
+export type Lang = "en" | "ar";
