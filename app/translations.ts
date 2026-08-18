@@ -14,6 +14,7 @@ export const translations = {
     wind: "Wind",
     feelsLike: "Feels Like",
     windUnit: "km/h",
+    footer: "© 2026 Weather App. All rights reserved.",
   },
   ar: {
     title: "تطبيق الطقس",
@@ -29,7 +30,7 @@ export const translations = {
     humidity: "الرطوبة",
     wind: "الرياح",
     feelsLike: "الإحساس الحراري",
-    windUnit: "كم/س",
+    windUnit: "كم/س",footer: "© 2026 تطبيق الطقس. جميع الحقوق محفوظة.",
   },
 };
 

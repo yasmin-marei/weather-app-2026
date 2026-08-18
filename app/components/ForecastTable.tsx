@@ -45,8 +45,7 @@ export default function ForecastTable({
                 <td className="px-4 py-3 text-gray-400">
                   {d.high}° / {d.low}°
                 </td>
-                <td className="px-4 py-3 text-gray-400 flex items-center gap-2">
-                  {d.condition}
+<td className="px-4 py-3 text-gray-400 flex items-center gap-2 text-start">                  {d.condition}
                   <span className="text-lg">{d.icon}</span>
                 </td>
               </tr>

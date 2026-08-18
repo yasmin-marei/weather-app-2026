@@ -24,7 +24,7 @@ export default function SearchBar({
     <form onSubmit={handleSubmit} className="w-full max-w-2xl">
       <div className="relative">
         <svg
-          className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
+          className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -43,7 +43,7 @@ export default function SearchBar({
           placeholder={placeholder}
           disabled={disabled}
           aria-label={placeholder}
-          className="w-full rounded-lg bg-[#1a1d24] border border-white/10 pl-11 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+          className="w-full rounded-lg bg-[#1a1d24] border border-white/10 ps-11 pe-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />
       </div>
     </form>

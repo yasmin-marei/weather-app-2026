@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
 import Header from "./components/Header";
 import SearchBar from "./components/SearchBar";
 import StatCard from "./components/StatCard";
 import ForecastTable from "./components/ForecastTable";
 import { translations, Lang } from "./translations";
-
+import Footer from "./components/Footer";
 interface ForecastDay {
   day: string;
   high: number;
@@ -97,12 +98,16 @@ export default function Home() {
   }, [lang]);
 
   // Auto-search once when the last city is loaded from localStorage
-  useEffect(() => {
-    if (query && status === "idle") {
-      handleSearch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+useEffect(() => {
+  if (!query) return;
+
+  const timeoutId = setTimeout(() => {
+    handleSearch();
+  }, 1000);
+
+  return () => clearTimeout(timeoutId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [query]);
 
   const toggleUnit = () => {
     setUnit((prev) => (prev === "C" ? "F" : "C"));
@@ -210,6 +215,9 @@ export default function Home() {
           </>
         )}
       </div>
+
+      <Footer text={t.footer} />
+
     </main>
   );
 }
