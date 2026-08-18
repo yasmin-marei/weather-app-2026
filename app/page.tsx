@@ -213,10 +213,11 @@ export default function Home() {
               <h2 className="text-2xl font-bold">
                 {weather.city}, {weather.country}
               </h2>
-              <p className="text-gray-400">
-                {weather.icon} {weather.condition} {t.highOf}{" "}
-                {displayTemp(weather.temperature)}°{unit}
-              </p>
+             <p className="text-gray-400">
+  <span className="animate-icon text-xl">{weather.icon}</span>{" "}
+  {weather.condition} {t.highOf}{" "}
+  {displayTemp(weather.temperature)}°{unit}
+</p>
             </div>
 
 <div className="flex flex-wrap gap-4 w-full">              <StatCard label={t.humidity} value={`${weather.humidity}%`} />

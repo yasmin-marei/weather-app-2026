@@ -34,3 +34,16 @@ a {
 button:disabled {
   cursor: not-allowed;
 } 
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.05);
+  }
+}
+
+.animate-icon {
+  display: inline-block;
+  animation: icon-bounce 2s ease-in-out infinite;
+}
