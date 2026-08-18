@@ -6,8 +6,9 @@ import Header from "./components/Header";
 import SearchBar from "./components/SearchBar";
 import StatCard from "./components/StatCard";
 import ForecastTable from "./components/ForecastTable";
-import { translations, Lang } from "./translations";
 import Footer from "./components/Footer";
+import { translations, Lang } from "./translations";
+
 interface ForecastDay {
   day: string;
   high: number;
@@ -39,7 +40,6 @@ export default function Home() {
 
   const t = translations[lang];
 
-  // Load recent searches + last searched city on first load
   useEffect(() => {
     const stored = localStorage.getItem("recentSearches");
     if (stored) {
@@ -89,25 +89,51 @@ export default function Home() {
     }
   };
 
-  // Re-run search automatically when language changes (if a result is already shown)
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      setErrorMessage(t.locationUnavailable);
+      setStatus("error");
+      return;
+    }
+
+    setStatus("loading");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const res = await fetch(
+            `/api/weather-by-coords?lat=${latitude}&lon=${longitude}&lang=${lang}`
+          );
+          const data = await res.json();
+
+          if (!res.ok) {
+            setErrorMessage(data.error || t.locationUnavailable);
+            setStatus("error");
+            return;
+          }
+
+          setWeather(data);
+          setStatus("success");
+          setQuery(data.city);
+        } catch {
+          setErrorMessage(t.locationUnavailable);
+          setStatus("error");
+        }
+      },
+      () => {
+        setErrorMessage(t.locationDenied);
+        setStatus("error");
+      }
+    );
+  };
+
   useEffect(() => {
     if (weather) {
       handleSearch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
-
-  // Auto-search once when the last city is loaded from localStorage
-useEffect(() => {
-  if (!query) return;
-
-  const timeoutId = setTimeout(() => {
-    handleSearch();
-  }, 1000);
-
-  return () => clearTimeout(timeoutId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [query]);
 
   const toggleUnit = () => {
     setUnit((prev) => (prev === "C" ? "F" : "C"));
@@ -138,13 +164,14 @@ useEffect(() => {
         title={t.title}
       />
 
-      <div className="flex flex-col items-center gap-6 w-full max-w-3xl px-6 py-8">
-        <SearchBar
+<div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-3xl px-4 sm:px-6 py-6 sm:py-8">        <SearchBar
           value={query}
           onChange={setQuery}
           onSubmit={handleSearch}
           disabled={status === "loading"}
           placeholder={t.searchPlaceholder}
+          lang={lang}
+          onUseLocation={handleUseLocation}
         />
 
         {status === "idle" && (
@@ -170,7 +197,10 @@ useEffect(() => {
         )}
 
         {status === "loading" && (
-          <p className="text-gray-400 mt-4 animate-pulse">{t.loading}</p>
+          <div className="flex flex-col items-center gap-3 mt-4">
+            <div className="h-8 w-8 rounded-full border-2 border-gray-600 border-t-white animate-spin-slow" />
+            <p className="text-gray-400">{t.loading}</p>
+          </div>
         )}
 
         {status === "error" && (
@@ -178,7 +208,7 @@ useEffect(() => {
         )}
 
         {status === "success" && weather && (
-          <>
+          <div className="w-full flex flex-col items-center gap-6 animate-fade-in">
             <div className="flex flex-col items-center gap-2 text-center">
               <h2 className="text-2xl font-bold">
                 {weather.city}, {weather.country}
@@ -212,12 +242,11 @@ useEffect(() => {
                 low: displayTemp(d.low),
               }))}
             />
-          </>
+          </div>
         )}
       </div>
 
       <Footer text={t.footer} />
-
     </main>
   );
 }

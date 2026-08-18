@@ -15,6 +15,8 @@ export const translations = {
     feelsLike: "Feels Like",
     windUnit: "km/h",
     footer: "© 2026 Weather App. All rights reserved.",
+     locationDenied: "Location access denied. Please search manually.",
+    locationUnavailable: "Unable to get your location.",
   },
   ar: {
     title: "تطبيق الطقس",
@@ -30,7 +32,10 @@ export const translations = {
     humidity: "الرطوبة",
     wind: "الرياح",
     feelsLike: "الإحساس الحراري",
-    windUnit: "كم/س",footer: "© 2026 تطبيق الطقس. جميع الحقوق محفوظة.",
+    windUnit: "كم/س",
+    footer: "© 2026 تطبيق الطقس. جميع الحقوق محفوظة.",
+     locationDenied: "تم رفض الوصول للموقع. الرجاء البحث يدوياً.",
+    locationUnavailable: "تعذر تحديد موقعك الحالي.",
   },
 };
 
