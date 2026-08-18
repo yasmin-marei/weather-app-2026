@@ -219,8 +219,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex gap-4 w-full">
-              <StatCard label={t.humidity} value={`${weather.humidity}%`} />
+<div className="flex flex-wrap gap-4 w-full">              <StatCard label={t.humidity} value={`${weather.humidity}%`} />
               <StatCard
                 label={t.wind}
                 value={`${weather.windSpeed} ${t.windUnit}`}
