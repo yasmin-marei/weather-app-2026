@@ -48,17 +48,11 @@ export default function Home() {
   const t = translations[lang];
 
   useEffect(() => {
-    const stored = localStorage.getItem("recentSearches");
-    if (stored) {
-      setRecentSearches(JSON.parse(stored));
-    }
-
-    const lastCity = localStorage.getItem("lastSearchedCity");
-    if (lastCity) {
-      setQuery(lastCity);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const stored = localStorage.getItem("recentSearches");
+  if (stored) {
+    setRecentSearches(JSON.parse(stored));
+  }
+}, []);
 
   // دالة موحّدة لجلب الطقس بالمدينة (تستخدم بالبحث اليدوي وإعادة الجلب عند تبديل اللغة)
   const fetchWeatherByCity = async (cityName: string, currentLang: Lang) => {
