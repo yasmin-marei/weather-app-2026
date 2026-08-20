@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      city: place?.name || (lang === "ar" ? "موقعك الحالي" : "Your location"),
+      city: place?.name || (lang === "ar" ? "موقع غير معروف" : "Unknown location"),
       country: place?.country || "",
       temperature: Math.round(current.temperature_2m),
       condition: currentWeather.condition,

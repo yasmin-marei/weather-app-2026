@@ -29,6 +29,10 @@ interface WeatherData {
   forecast: ForecastDay[];
 }
 
+type WeatherSource =
+  | { type: "city"; city: string }
+  | { type: "coords"; lat: number; lon: number };
+
 export default function Home() {
   const [query, setQuery] = useState("");
   const [unit, setUnit] = useState<"C" | "F">("C");
@@ -37,6 +41,9 @@ export default function Home() {
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "success">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  // هون التتبع الجديد: بنحفظ "كيف" وصلنا لآخر نتيجة ناجحة
+  const [lastSource, setLastSource] = useState<WeatherSource | null>(null);
 
   const t = translations[lang];
 
@@ -53,16 +60,14 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSearch = async () => {
-    const trimmed = query.trim();
-    if (!trimmed) return;
-
+  // دالة موحّدة لجلب الطقس بالمدينة (تستخدم بالبحث اليدوي وإعادة الجلب عند تبديل اللغة)
+  const fetchWeatherByCity = async (cityName: string, currentLang: Lang) => {
     setStatus("loading");
     setErrorMessage("");
 
     try {
       const res = await fetch(
-        `/api/weather?city=${encodeURIComponent(trimmed)}&lang=${lang}`
+        `/api/weather?city=${encodeURIComponent(cityName)}&lang=${currentLang}`
       );
       const data = await res.json();
 
@@ -74,6 +79,7 @@ export default function Home() {
 
       setWeather(data);
       setStatus("success");
+      setLastSource({ type: "city", city: cityName });
 
       const cityLabel = `${data.city}, ${data.country}`;
       const updated = [
@@ -89,6 +95,43 @@ export default function Home() {
     }
   };
 
+  // دالة موحّدة لجلب الطقس بالإحداثيات (تستخدم بزر الموقع وإعادة الجلب عند تبديل اللغة)
+  const fetchWeatherByCoords = async (
+    lat: number,
+    lon: number,
+    currentLang: Lang
+  ) => {
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      const res = await fetch(
+        `/api/weather-by-coords?lat=${lat}&lon=${lon}&lang=${currentLang}`
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMessage(data.error || t.locationUnavailable);
+        setStatus("error");
+        return;
+      }
+
+      setWeather(data);
+      setStatus("success");
+      setQuery(data.city);
+      setLastSource({ type: "coords", lat, lon });
+    } catch {
+      setErrorMessage(t.locationUnavailable);
+      setStatus("error");
+    }
+  };
+
+  const handleSearch = () => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    fetchWeatherByCity(trimmed, lang);
+  };
+
   const handleUseLocation = () => {
     if (!navigator.geolocation) {
       setErrorMessage(t.locationUnavailable);
@@ -99,27 +142,9 @@ export default function Home() {
     setStatus("loading");
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      (position) => {
         const { latitude, longitude } = position.coords;
-        try {
-          const res = await fetch(
-            `/api/weather-by-coords?lat=${latitude}&lon=${longitude}&lang=${lang}`
-          );
-          const data = await res.json();
-
-          if (!res.ok) {
-            setErrorMessage(data.error || t.locationUnavailable);
-            setStatus("error");
-            return;
-          }
-
-          setWeather(data);
-          setStatus("success");
-          setQuery(data.city);
-        } catch {
-          setErrorMessage(t.locationUnavailable);
-          setStatus("error");
-        }
+        fetchWeatherByCoords(latitude, longitude, lang);
       },
       () => {
         setErrorMessage(t.locationDenied);
@@ -128,9 +153,14 @@ export default function Home() {
     );
   };
 
+  
   useEffect(() => {
-    if (weather) {
-      handleSearch();
+    if (!lastSource) return;
+
+    if (lastSource.type === "coords") {
+      fetchWeatherByCoords(lastSource.lat, lastSource.lon, lang);
+    } else {
+      fetchWeatherByCity(lastSource.city, lang);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
@@ -143,10 +173,10 @@ export default function Home() {
     setLang((prev) => (prev === "en" ? "ar" : "en"));
   };
 
-  const handleRecentClick = (cityLabel: string) => {
-    const cityOnly = cityLabel.split(",")[0].trim();
-    setQuery(cityOnly);
-  };
+const handleRecentClick = (cityLabel: string) => {
+  const cityOnly = cityLabel.split(",")[0].trim();
+  fetchWeatherByCity(cityOnly, lang);
+};
 
   const displayTemp = (celsius: number) =>
     unit === "F" ? Math.round((celsius * 9) / 5 + 32) : celsius;
@@ -164,7 +194,8 @@ export default function Home() {
         title={t.title}
       />
 
-<div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-3xl px-4 sm:px-6 py-6 sm:py-8">        <SearchBar
+      <div className="flex flex-col items-center gap-6 w-full max-w-3xl px-6 py-8">
+        <SearchBar
           value={query}
           onChange={setQuery}
           onSubmit={handleSearch}
@@ -213,14 +244,15 @@ export default function Home() {
               <h2 className="text-2xl font-bold">
                 {weather.city}, {weather.country}
               </h2>
-             <p className="text-gray-400">
-  <span className="animate-icon text-xl">{weather.icon}</span>{" "}
-  {weather.condition} {t.highOf}{" "}
-  {displayTemp(weather.temperature)}°{unit}
-</p>
+              <p className="text-gray-400">
+                <span className="animate-icon text-xl">{weather.icon}</span>{" "}
+                {weather.condition} {t.highOf}{" "}
+                {displayTemp(weather.temperature)}°{unit}
+              </p>
             </div>
 
-<div className="flex flex-wrap gap-4 w-full">              <StatCard label={t.humidity} value={`${weather.humidity}%`} />
+            <div className="flex flex-wrap gap-4 w-full">
+              <StatCard label={t.humidity} value={`${weather.humidity}%`} />
               <StatCard
                 label={t.wind}
                 value={`${weather.windSpeed} ${t.windUnit}`}
